@@ -3,6 +3,7 @@ package com.captech.android.demos.slices.provider
 import android.app.PendingIntent
 import android.content.ContentResolver
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import androidx.core.graphics.drawable.IconCompat
 
@@ -10,6 +11,7 @@ import androidx.slice.Slice
 import androidx.slice.SliceProvider
 import androidx.slice.builders.ListBuilder
 import androidx.slice.builders.ListBuilder.LARGE_IMAGE
+import androidx.slice.builders.ListBuilder.SMALL_IMAGE
 import androidx.slice.builders.SliceAction
 import com.captech.android.demos.slices.MainActivity
 import com.captech.android.demos.slices.R
@@ -54,21 +56,6 @@ class BankSliceProvider : SliceProvider() {
         }
     }
 
-    /**
-     * Slice has been pinned to external process. Subscribe to data source if necessary.
-     */
-    override fun onSlicePinned(sliceUri: Uri?) {
-        // When data is received, call context.contentResolver.notifyChange(sliceUri, null) to
-        // trigger MySliceProvider#onBindSlice(Uri) again.
-    }
-
-    /**
-     * Unsubscribe from data source if necessary.
-     */
-    override fun onSliceUnpinned(sliceUri: Uri?) {
-        // Remove any observers if necessary to avoid memory leaks.
-    }
-
     private fun createPaymentDueSlice(sliceUri: Uri): Slice {
         val activityAction = loginAction()
         return ListBuilder(context, sliceUri, ListBuilder.INFINITY)
@@ -90,6 +77,7 @@ class BankSliceProvider : SliceProvider() {
     private fun createAtmSlice(sliceUri: Uri): Slice {
         // Create the parent builder.
         return ListBuilder(context, sliceUri, ListBuilder.INFINITY)
+                .setAccentColor(Color.parseColor("#000000"))
                 .setHeader {
                     it.apply {
                         setTitle("Nearby ATMs")
@@ -97,11 +85,12 @@ class BankSliceProvider : SliceProvider() {
                         setPrimaryAction(mapsAction())
                     }
                 }
+                .addAction(mapsAction())
                 .addGridRow {
                     it.apply {
                         addCell {
                             it.apply {
-                                addImage(IconCompat.createWithResource(context, R.drawable.bank1), LARGE_IMAGE)
+                                addImage(IconCompat.createWithResource(context, R.drawable.bank).setTint(Color.parseColor("#db3236")), SMALL_IMAGE)
                                 addTitleText("Bank 1")
                                 addText("0.7 mil")
                                 setContentIntent(mapsIntent())
@@ -109,7 +98,7 @@ class BankSliceProvider : SliceProvider() {
                         }
                         addCell {
                             it.apply {
-                                addImage(IconCompat.createWithResource(context, R.drawable.bank2), LARGE_IMAGE)
+                                addImage(IconCompat.createWithResource(context, R.drawable.bank).setTint(Color.parseColor("#f4c20d")), SMALL_IMAGE)
                                 addTitleText("Bank 2")
                                 addText("2.5 mil")
                                 setContentIntent(mapsIntent())
@@ -117,7 +106,7 @@ class BankSliceProvider : SliceProvider() {
                         }
                         addCell {
                             it.apply {
-                                addImage(IconCompat.createWithResource(context, R.drawable.bank1), LARGE_IMAGE)
+                                addImage(IconCompat.createWithResource(context, R.drawable.bank).setTint(Color.parseColor("#3cba54")), SMALL_IMAGE)
                                 addTitleText("Bank 3")
                                 addText("2.9 mi")
                                 setContentIntent(mapsIntent())
@@ -125,7 +114,7 @@ class BankSliceProvider : SliceProvider() {
                         }
                         addCell {
                             it.apply {
-                                addImage(IconCompat.createWithResource(context, R.drawable.bank2), LARGE_IMAGE)
+                                addImage(IconCompat.createWithResource(context, R.drawable.bank).setTint(Color.parseColor("#4885ed")), SMALL_IMAGE)
                                 addTitleText("Bank 4")
                                 addText("4.2 mi")
                                 setContentIntent(mapsIntent())
@@ -134,11 +123,6 @@ class BankSliceProvider : SliceProvider() {
                     }
                 }
                 .build()
-    }
-
-    private fun createBankOneIntent() : PendingIntent {
-        val intent = Intent(context, MainActivity::class.java)
-        return PendingIntent.getActivity(context, 0, intent, 0)
     }
 
     private fun mapsIntent() : PendingIntent {
@@ -150,8 +134,8 @@ class BankSliceProvider : SliceProvider() {
 
     private fun mapsAction(): SliceAction {
         return SliceAction(mapsIntent(),
-                IconCompat.createWithResource(context, R.mipmap.ic_launcher_round),
-                "Open MainActivity."
+                IconCompat.createWithResource(context, R.drawable.ic_map_marker),
+                "Open Google Maps."
         )
     }
 
