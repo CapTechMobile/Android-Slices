@@ -59,24 +59,20 @@ class HotelSliceProvider : SliceProvider() {
     override fun onBindSlice(sliceUri: Uri): Slice? {
         val context = getContext() ?: return null
         return when {
-            sliceUri.path == ContentUris.ReservationPaths.MAKE ->
+            sliceUri.path.equals(ContentUris.ReservationPaths.MAKE, true) ->
                 createSliceMakeReservation(context, sliceUri)
-            sliceUri.path == ContentUris.ReservationPaths.READY ->
-                ListBuilder(context, sliceUri, ListBuilder.INFINITY)
-                        .addRow { it.setTitle("Your Reservation is Ready.") }
-                        .build()
-            sliceUri.path == ContentUris.ReservationPaths.RATE ->
-                ListBuilder(context, sliceUri, ListBuilder.INFINITY)
-                        .addRow { it.setTitle("Rate Your Stay") }
-                        .build()
+            sliceUri.path.equals(ContentUris.ReservationPaths.READY, true) ->
+                createSliceReservationReady(context, sliceUri)
+            sliceUri.path.equals(ContentUris.ReservationPaths.RATE, true) ->
+                createSliceRateReservation(context, sliceUri)
             else -> null
         }
     }
 
     private fun createSliceMakeReservation(context: Context, sliceUri: Uri): Slice? {
         val maxHotels = 3;
-        var hotelRepo = HotelRepository();
-        var hotels: List<Hotel> = getSortedHotels(context, hotelRepo).take(maxHotels)
+        val hotelRepo = HotelRepository();
+        val hotels: List<Hotel> = getSortedHotels(context, hotelRepo).take(maxHotels)
         val seeMoreAction = SliceAction(createSeeMoreIntent(),
                 IconCompat.createWithResource(context, R.drawable.ic_more),
                 ICON_IMAGE, "Sort by Price")
@@ -86,7 +82,7 @@ class HotelSliceProvider : SliceProvider() {
         val sortByDistanceAction = SliceAction(createSortByDistanceIntent(),
                 IconCompat.createWithResource(context, R.drawable.ic_map_marker_distance),
                 ICON_IMAGE, "Sort by Distance")
-        var listBuilder = ListBuilder(context, sliceUri, ListBuilder.INFINITY)
+        val listBuilder = ListBuilder(context, sliceUri, ListBuilder.INFINITY)
                 .setHeader {
                     it.apply {
                         setTitle("Make a Reservation")
@@ -94,7 +90,7 @@ class HotelSliceProvider : SliceProvider() {
                     }
                 }
                 .addAction(seeMoreAction)
-        var gridRowBuilder = GridRowBuilder(listBuilder)
+        val gridRowBuilder = GridRowBuilder(listBuilder)
 
         hotels.forEach { hotel ->
             gridRowBuilder.addCell {
@@ -118,13 +114,33 @@ class HotelSliceProvider : SliceProvider() {
         return listBuilder.build()
     }
 
+    private fun createSliceReservationReady(context: Context, sliceUri: Uri): Slice? {
+        val listBuilder = ListBuilder(context, sliceUri, ListBuilder.INFINITY)
+                .setHeader {
+                    it.apply {
+                        setTitle("Your Reservation is Ready")
+                    }
+                }
+        return listBuilder.build()
+    }
+
+    private fun createSliceRateReservation(context: Context, sliceUri: Uri): Slice? {
+        val listBuilder = ListBuilder(context, sliceUri, ListBuilder.INFINITY)
+                .setHeader {
+                    it.apply {
+                        setTitle("Rate Your Stay")
+                    }
+                }
+        return listBuilder.build()
+    }
+
     private fun getSubtitleMakeReservation(): CharSequence {
-        @HotelRepository.SortingOptions var sortBy = (context.applicationContext as SlicesApplication).appState.sortingType
+        @HotelRepository.SortingOptions val sortBy = (context.applicationContext as SlicesApplication).appState.sortingType
         return if (!HotelRepository.NONE.equals(sortBy, true)) "By " + sortBy else "";
     }
 
     private fun getSortedHotels(context: Context, hotelRepo: HotelRepository): List<Hotel> {
-        @HotelRepository.SortingOptions var sortBy = (context.applicationContext as SlicesApplication).appState.sortingType
+        @HotelRepository.SortingOptions val sortBy = (context.applicationContext as SlicesApplication).appState.sortingType
         return when {
             HotelRepository.PRICE.equals(sortBy, true) ->
                 hotelRepo.hotels.sortedWith(compareBy({ it.ratePerNight }))
