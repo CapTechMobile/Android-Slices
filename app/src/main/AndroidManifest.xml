@@ -33,6 +33,22 @@
                     android:scheme="http" />
             </intent-filter>
         </provider>
+
+        <provider
+            android:name=".provider.BankSliceProvider"
+            android:authorities="com.captech.bankingslices"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.app.slice.category.SLICE" />
+
+                <data
+                    android:host="captech.com"
+                    android:pathPrefix="/"
+                    android:scheme="http" />
+            </intent-filter>
+        </provider>
         <receiver
             android:name=".receiver.HotelsBroadcastReceiver"
             android:enabled="true"
