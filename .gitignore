@@ -29,7 +29,6 @@ out/
 signing-*.properties
 !signing-debug.properties
 
-
 ##### GRADLE #####
 
 # Gradle files
@@ -41,10 +40,16 @@ build/
 ##### ANDROID STUDIO #####
 
 # Android Studio files
-.idea/*
 *.iml
 captures/
 .navigation/
 
 # Local configuration file (sdk path, etc)
 local.properties
+
+
+##### DON'T IGNORE THESE ######
+!.idea/
+!.idea/runConfigurations/**
+!.idea/runConfigurations.xml
+
