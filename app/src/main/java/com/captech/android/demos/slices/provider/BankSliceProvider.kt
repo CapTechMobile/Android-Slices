@@ -10,11 +10,10 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.slice.Slice
 import androidx.slice.SliceProvider
 import androidx.slice.builders.ListBuilder
-import androidx.slice.builders.ListBuilder.LARGE_IMAGE
 import androidx.slice.builders.ListBuilder.SMALL_IMAGE
 import androidx.slice.builders.SliceAction
-import com.captech.android.demos.slices.MainActivity
 import com.captech.android.demos.slices.R
+import com.captech.android.demos.slices.SendMoneyActivity
 
 class BankSliceProvider : SliceProvider() {
     /**
@@ -57,21 +56,16 @@ class BankSliceProvider : SliceProvider() {
     }
 
     private fun createPaymentDueSlice(sliceUri: Uri): Slice {
-        val activityAction = loginAction()
         return ListBuilder(context, sliceUri, ListBuilder.INFINITY)
-                .setAccentColor(0xff0F9D) // Specify color for tinting icons
-                .setHeader {
-                    it.apply {
-                        setTitle("Payment Due")
-                    }
-                }
+                .setAccentColor(Color.parseColor("#3cba54")) // Specify color for tinting icons
                 .addRow {
                     it.apply {
-                        setTitle("Due date: 5/20/18")
+                        setTitle("Payment Due: 5/20/18")
                         setSubtitle("Amount: $234.56")
-                        setPrimaryAction(activityAction)
+                        addEndItem(sendMoneyAction())
                     }
-                }.build()
+                }
+                .build()
     }
 
     private fun createAtmSlice(sliceUri: Uri): Slice {
@@ -92,7 +86,7 @@ class BankSliceProvider : SliceProvider() {
                             it.apply {
                                 addImage(IconCompat.createWithResource(context, R.drawable.bank).setTint(Color.parseColor("#db3236")), SMALL_IMAGE)
                                 addTitleText("Bank 1")
-                                addText("0.7 mil")
+                                addText("0.7 mi")
                                 setContentIntent(mapsIntent())
                             }
                         }
@@ -100,7 +94,7 @@ class BankSliceProvider : SliceProvider() {
                             it.apply {
                                 addImage(IconCompat.createWithResource(context, R.drawable.bank).setTint(Color.parseColor("#f4c20d")), SMALL_IMAGE)
                                 addTitleText("Bank 2")
-                                addText("2.5 mil")
+                                addText("2.5 mi")
                                 setContentIntent(mapsIntent())
                             }
                         }
@@ -125,7 +119,7 @@ class BankSliceProvider : SliceProvider() {
                 .build()
     }
 
-    private fun mapsIntent() : PendingIntent {
+    private fun mapsIntent(): PendingIntent {
         val gmmIntentUri = Uri.parse("google.navigation:q=7100+Forest+Ave, Richmond+Virginia")
         val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
         mapIntent.`package` = "com.google.android.apps.maps"
@@ -139,11 +133,9 @@ class BankSliceProvider : SliceProvider() {
         )
     }
 
-    private fun loginAction(): SliceAction {
-        val intent = Intent(context, MainActivity::class.java)
-        return SliceAction(PendingIntent.getActivity(context, 0, intent, 0),
-                IconCompat.createWithResource(context, R.drawable.abc_btn_check_material),
-                "Open LoginActivity."
-        )
+    private fun sendMoneyAction(): SliceAction {
+        val sendMoneyIntent = Intent(context, SendMoneyActivity::class.java)
+        return SliceAction(PendingIntent.getActivity(context, 0, sendMoneyIntent, 0),
+                IconCompat.createWithResource(context, R.drawable.ic_send_money), "Send Money Action")
     }
 }
