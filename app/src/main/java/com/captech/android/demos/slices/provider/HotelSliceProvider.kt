@@ -10,12 +10,9 @@ import androidx.slice.Slice
 import androidx.slice.SliceProvider
 import androidx.slice.builders.GridRowBuilder
 import androidx.slice.builders.ListBuilder
-import androidx.slice.builders.ListBuilder.ICON_IMAGE
-import androidx.slice.builders.ListBuilder.LARGE_IMAGE
+import androidx.slice.builders.ListBuilder.*
 import androidx.slice.builders.SliceAction
-import com.captech.android.demos.slices.R
-import com.captech.android.demos.slices.SlicesApplication
-import com.captech.android.demos.slices.ViewHotelActivity
+import com.captech.android.demos.slices.*
 import com.captech.android.demos.slices.data.model.Hotel
 import com.captech.android.demos.slices.data.repository.HotelRepository
 import com.captech.android.demos.slices.receiver.HotelsBroadcastReceiver
@@ -116,10 +113,33 @@ class HotelSliceProvider : SliceProvider() {
     }
 
     private fun createSliceReservationReady(context: Context, sliceUri: Uri): Slice? {
+        val hotelRepo = HotelRepository();
+        val hotel = hotelRepo.hotels.first();
+        val checkInAction = SliceAction(createCheckInIntent(),
+                IconCompat.createWithResource(context, R.drawable.ic_marker_check),
+                ICON_IMAGE, "Check In")
+        val messageHotelAction = SliceAction(createMessageIntent(),
+                IconCompat.createWithResource(context, R.drawable.ic_forum),
+                ICON_IMAGE, "Message the Front Desk")
         val listBuilder = ListBuilder(context, sliceUri, ListBuilder.INFINITY)
                 .setHeader {
                     it.apply {
                         setTitle("Your Reservation is Ready")
+                        setPrimaryAction(checkInAction)
+                    }
+                }
+                .addAction(checkInAction)
+                .addAction(messageHotelAction)
+                .addGridRow {
+                    it.apply {
+                        addCell {
+                            it.apply {
+                                addImage(IconCompat.createWithResource(context, hotel.imageResId), LARGE_IMAGE)
+                                addTitleText(hotel.name)
+                                addText(getPriceAndDistance(context, hotel))
+                                setContentIntent(createViewHotelIntent(hotel))
+                            }
+                        }
                     }
                 }
         return listBuilder.build()
@@ -132,6 +152,29 @@ class HotelSliceProvider : SliceProvider() {
                         setTitle("Rate Your Stay")
                     }
                 }
+        val gridRowBuilder = GridRowBuilder(listBuilder)
+
+        val rating = (context.applicationContext as SlicesApplication).appState.rating
+        val remainingRating = HotelUtils.getRemainingRating(rating);
+        for (i in 1..rating) {
+            gridRowBuilder.addCell {
+                it.apply {
+                    addImage(IconCompat.createWithResource(context, R.drawable.ic_star_filled), SMALL_IMAGE)
+                    setContentIntent(createSetRatingIntent(i))
+                }
+            }
+        }
+        if (rating < HotelUtils.MAX_RATING) {
+            for (i in rating + 1..(rating + remainingRating)) {
+                gridRowBuilder.addCell {
+                    it.apply {
+                        addImage(IconCompat.createWithResource(context, R.drawable.ic_star), SMALL_IMAGE)
+                        setContentIntent(createSetRatingIntent(i))
+                    }
+                }
+            }
+        }
+        listBuilder.addGridRow(gridRowBuilder)
         return listBuilder.build()
     }
 
@@ -175,10 +218,10 @@ class HotelSliceProvider : SliceProvider() {
     }
 
     private fun createSeeMoreIntent(): PendingIntent {
-        val intent = Intent(context, HotelsBroadcastReceiver::class.java)
-        val requestCode = HotelsBroadcastReceiver.REQUEST_CODE_SEE_MORE
-        intent.putExtra(HotelsBroadcastReceiver.EXTRA_REQUEST_CODE, requestCode)
-        return PendingIntent.getBroadcast(context, requestCode, intent, 0)
+        val intent = Intent(context, SeeMoreHotelsActivity::class.java)
+        val requestCode = SeeMoreHotelsActivity.REQUEST_CODE_SEE_MORE_HOTELS
+        intent.setAction(System.currentTimeMillis().toString())
+        return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     private fun createViewHotelIntent(hotel: Hotel): PendingIntent {
@@ -187,6 +230,29 @@ class HotelSliceProvider : SliceProvider() {
         intent.putExtra(ViewHotelActivity.EXTRA_HOTEL, hotel)
         intent.setAction(System.currentTimeMillis().toString())
         return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
+    private fun createCheckInIntent(): PendingIntent {
+        val intent = Intent(context, HotelsBroadcastReceiver::class.java)
+        val requestCode = HotelsBroadcastReceiver.REQUEST_CODE_CHECK_IN
+        intent.putExtra(HotelsBroadcastReceiver.EXTRA_REQUEST_CODE, requestCode)
+        return PendingIntent.getBroadcast(context, requestCode, intent, 0)
+    }
+
+    private fun createMessageIntent(): PendingIntent {
+        val intent = Intent(context, MessageHotelActivity::class.java)
+        val requestCode = MessageHotelActivity.REQUEST_CODE_MESSAGE_HOTEL
+        intent.setAction(System.currentTimeMillis().toString())
+        return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
+    private fun createSetRatingIntent(rating: Int): PendingIntent {
+        val intent = Intent(context, HotelsBroadcastReceiver::class.java)
+        val requestCode = HotelsBroadcastReceiver.REQUEST_CODE_SET_RATING
+        intent.putExtra(HotelsBroadcastReceiver.EXTRA_REQUEST_CODE, requestCode)
+        intent.putExtra(HotelsBroadcastReceiver.EXTRA_RATING, rating)
+        intent.setAction(System.currentTimeMillis().toString())
+        return PendingIntent.getBroadcast(context, requestCode, intent, 0)
     }
 
     /**

@@ -17,8 +17,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ViewHotelActivity"/>
-        <activity android:name=".SeeMoreHotelsActivity"/>
+        <activity android:name=".ViewHotelActivity" />
+        <activity android:name=".SeeMoreHotelsActivity" />
 
         <provider
             android:name=".provider.HotelSliceProvider"
@@ -55,6 +55,8 @@
             android:name=".receiver.HotelsBroadcastReceiver"
             android:enabled="true"
             android:exported="true" />
+
+        <activity android:name=".MessageHotelActivity"></activity>
     </application>
 
 </manifest>

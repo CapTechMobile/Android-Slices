@@ -13,8 +13,10 @@ class HotelsBroadcastReceiver : BroadcastReceiver() {
     companion object {
         const val REQUEST_CODE_SORT_BY_PRICE = 2001
         const val REQUEST_CODE_SORT_BY_DISTANCE = 2002
-        const val REQUEST_CODE_SEE_MORE = 2003
+        const val REQUEST_CODE_CHECK_IN = 2003
+        const val REQUEST_CODE_SET_RATING = 2004
         const val EXTRA_REQUEST_CODE = "EXTRA_REQUEST_CODE"
+        const val EXTRA_RATING = "EXTRA_RATING"
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -29,9 +31,18 @@ class HotelsBroadcastReceiver : BroadcastReceiver() {
                     setSortingType(context, HotelRepository.SortBy.DISTANCE)
                     refreshReservationList(context)
                 }
-                requestCode == REQUEST_CODE_SEE_MORE -> {
-                    Toast.makeText(context, "SEE MORE",
+                requestCode == REQUEST_CODE_CHECK_IN -> {
+                    Toast.makeText(context, "Checking you in - Enjoy your stay!",
                             Toast.LENGTH_LONG).show()
+                }
+                requestCode == REQUEST_CODE_SET_RATING -> {
+                    if (intent.hasExtra(EXTRA_RATING)) {
+                        val rating = intent.getIntExtra(EXTRA_RATING, 0)
+                        Toast.makeText(context, "Rate Clicked " + rating,
+                                Toast.LENGTH_LONG).show()
+                        setRating(context, rating)
+                        refreshRating(context)
+                    }
                 }
             }
         }
@@ -43,12 +54,23 @@ class HotelsBroadcastReceiver : BroadcastReceiver() {
         }
     }
 
+    private fun refreshRating(context: Context?) {
+        if (context != null) {
+            context.contentResolver.notifyChange(ContentUris.URI_RATE, null)
+        }
+    }
+
     private fun setSortingType(context: Context?, @HotelRepository.SortingOptions sortingOption: String) {
         val application = getApplication(context)
         if (application != null) {
             application.appState.sortingType = sortingOption
-            Toast.makeText(context, getApplication(context)?.appState?.sortingType,
-                    Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun setRating(context: Context?, rating: Int) {
+        val application = getApplication(context)
+        if (application != null) {
+            application.appState.rating = rating
         }
     }
 
