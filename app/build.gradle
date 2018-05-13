@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 
+apply plugin: 'kotlin-kapt'
+
 apply plugin: 'kotlin-android-extensions'
 
 android {
@@ -20,6 +22,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {
@@ -31,6 +36,7 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.0.0-alpha1'
     implementation 'androidx.slice:slice-core:1.0.0-alpha1'
     implementation 'androidx.slice:slice-builders:1.0.0-alpha1'
+    kapt 'com.android.databinding:compiler:3.1.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha1'

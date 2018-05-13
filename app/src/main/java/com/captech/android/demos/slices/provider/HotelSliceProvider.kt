@@ -15,6 +15,7 @@ import androidx.slice.builders.ListBuilder.LARGE_IMAGE
 import androidx.slice.builders.SliceAction
 import com.captech.android.demos.slices.R
 import com.captech.android.demos.slices.SlicesApplication
+import com.captech.android.demos.slices.ViewHotelActivity
 import com.captech.android.demos.slices.data.model.Hotel
 import com.captech.android.demos.slices.data.repository.HotelRepository
 import com.captech.android.demos.slices.receiver.HotelsBroadcastReceiver
@@ -98,7 +99,7 @@ class HotelSliceProvider : SliceProvider() {
                     addImage(IconCompat.createWithResource(context, hotel.imageResId), LARGE_IMAGE)
                     addTitleText(hotel.name)
                     addText(getPriceAndDistance(context, hotel))
-                    setContentIntent(createSeeMoreIntent())
+                    setContentIntent(createViewHotelIntent(hotel))
                 }
             }
         }
@@ -178,6 +179,14 @@ class HotelSliceProvider : SliceProvider() {
         val requestCode = HotelsBroadcastReceiver.REQUEST_CODE_SEE_MORE
         intent.putExtra(HotelsBroadcastReceiver.EXTRA_REQUEST_CODE, requestCode)
         return PendingIntent.getBroadcast(context, requestCode, intent, 0)
+    }
+
+    private fun createViewHotelIntent(hotel: Hotel): PendingIntent {
+        val intent = Intent(context, ViewHotelActivity::class.java)
+        val requestCode = ViewHotelActivity.REQUEST_CODE_VIEW_HOTEL
+        intent.putExtra(ViewHotelActivity.EXTRA_HOTEL, hotel)
+        intent.setAction(System.currentTimeMillis().toString())
+        return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     /**
