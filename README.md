@@ -6,8 +6,8 @@ by [Jack Hughes](https://github.com/jackovt) and [Alisher Pazylbekov](https://gi
 Slices are templated views that have the ability to show and interact with content from an app from Google Search and later, places like the Google Assistant. This is a demonstration of functionality in a sample hotel and banking application. 
 
 ### Getting Started
-- android studio
-- androidx library, remove older libraries
+- You'll need to get the latest version of Android studio to use Slices. At the Time of writing this, the latest was Android Studio 3.2 Canary 14, so get that version or newer.
+- Google has begun repackaging their suppor library as the "androidx" library, and you'll get the backwards compatibility by using the androidx library. The androidx library and the native android Slices do NOT mix, so be careful
 - using Activity + Fragment + ViewModel
 - when setting up initial SliceProvider, use Android -> new file -> other -> SliceProvider, Android sets up everything for you correctly
 - make sure to add broadcast receiver to AndroidManifest.xml
