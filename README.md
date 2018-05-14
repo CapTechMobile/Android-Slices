@@ -18,3 +18,5 @@ To get started, you'll need to get the latest version of Android Studio. At the 
 - set up the run configurations as recommended in the [Getting Started](https://developer.android.com/guide/slices/getting-started) guide, it made testing slices much easier 
 - make sure to use latest gradle versions, an easy way to be certain or to find specific dependencies is to look in the [Maven Repository](https://mvnrepository.com/search?q=androidx)
 	- `implementation 'androidx.slice:slices-core:1.0.0-alpha1'` and `implementation 'androidx.slice:slices-builders:1.0.0-alpha1'` caused builds to fail, make sure to update to `androidx.slice:slice`
+
+![App Demo](https://raw.githubusercontent.com/CapTechMobile/Android-Slices/master/screenshots/app-demo.gif)
